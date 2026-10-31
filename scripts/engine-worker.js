@@ -100,11 +100,15 @@ self.onmessage = async (e) => {
     const t1 = performance.now();
     const FS = module.FS;
     const loaded = new Set();
+    if (msg.reset) unpacked.clear();
     for (const name of msg.bundles ?? []) bundleSync(name);
     mountTree(FS, loaded);
     const t2 = performance.now();
     FS.mkdirTree('/work');
-    for (const [p, content] of Object.entries(msg.files ?? {})) {
+    // Input files: given, or fetched from URLs (large projects)
+    const inputs = { ...(msg.files ?? {}) };
+    for (const [p, url] of Object.entries(msg.fileUrls ?? {})) inputs[p] = new Uint8Array(await (await fetch(url)).arrayBuffer());
+    for (const [p, content] of Object.entries(inputs)) {
       const file = `/work/${p}`;
       FS.mkdirTree(file.slice(0, file.lastIndexOf('/')));
       FS.writeFile(file, content);
@@ -124,7 +128,7 @@ self.onmessage = async (e) => {
           if (name === '.' || name === '..') continue;
           const p = `${dir}/${name}`;
           if (FS.isDir(FS.stat(p).mode)) walk(p);
-          else if (!(p.slice(6) in (msg.files ?? {}))) wanted.push(p.slice(6));
+          else if (!(p.slice(6) in (msg.fileUrls ?? {}))) wanted.push(p.slice(6));
         }
       };
       walk('/work');
