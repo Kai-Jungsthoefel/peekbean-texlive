@@ -1,0 +1,14 @@
+{
+  "name": "peekbean-texlive",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs && node scripts/formats.mjs",
+    "formats": "node scripts/formats.mjs"
+  },
+  "devDependencies": {
+    "fflate": "^0.8.3",
+    "playwright-core": "^1.56.0"
+  }
+}

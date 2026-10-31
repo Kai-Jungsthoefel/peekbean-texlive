@@ -1,0 +1,8 @@
+{
+ "url": "https://github.com/SiglumProject/siglum-engine/releases/download/v0.1.0",
+ "version": "Siglum engine v0.1.0 (busytex, TeX Live 2025)",
+ "files": {
+  "busytex.js": "53374fbb04e9b485c5854ae107cb68c3d3b79735e684c6049a7597013a23ff2b",
+  "busytex.wasm": "3efcd116f16e058048f0870d5fbe75eafe6441063d9e7f83e617bf57102645bd"
+ }
+}
