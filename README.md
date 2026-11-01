@@ -6,8 +6,8 @@ TeX Live for the LaTeX viewer of [Peekbean](https://github.com/Kai-Jungsthoefel/
 
 | Path | What |
 |---|---|
-| `texlive/bundles/<package>.gz` | The run files of one TeX Live package, concatenated and gzipped. Packages larger than 24 MiB compressed are split into `<package>~1.gz`, `<package>~2.gz` … (static hosts such as Cloudflare Pages serve files up to 25 MiB). |
-| `texlive/bundles/~config.gz` | What `tlmgr` generates on installation: pdfTeX's font map (`pdftex.map`, from all packages' map files, as `updmap` writes it) and the hyphenation configuration (`language.dat`, `language.def`, `language.dat.lua`). |
+| `texlive/bundles/<package>.gz` | The run files of one TeX Live package, concatenated and gzipped. Packages larger than 2 MiB are split into `<package>~1.gz`, `<package>~2.gz` …: a bundle is fetched whole when TeX first reads one of its files, so a document that uses a few fonts of a large font package loads only their parts. No file is larger than 25 MiB, the limit of static hosts such as Cloudflare Pages. |
+| `texlive/bundles/~config~1.gz` … | What `tlmgr` generates on installation: pdfTeX's font map (`pdftex.map`, from all packages' map files, as `updmap` writes it) and the hyphenation configuration (`language.dat`, `language.def`, `language.dat.lua`). |
 | `texlive/bundles/fmt-pdflatex.gz`, `fmt-xelatex.gz` | The formats, built by the engine below from these bundles. |
 | `texlive/engine/` | The TeX engines compiled to WebAssembly: [Siglum](https://github.com/SiglumProject/siglum-engine)'s build of [busytex](https://github.com/busytex/busytex) (pdfTeX, XeTeX, BibTeX, dvipdfmx …, TeX Live 2025). The WebAssembly is split in two for the same 25 MiB limit. |
 | `texlive/index.json` | Every file (path relative to `texmf-dist`) with its bundle and byte range in the unpacked bundle, the bundles' sizes, and where everything came from. |

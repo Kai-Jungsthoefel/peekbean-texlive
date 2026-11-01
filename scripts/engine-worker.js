@@ -101,7 +101,10 @@ self.onmessage = async (e) => {
     const FS = module.FS;
     const loaded = new Set();
     if (msg.reset) unpacked.clear();
-    for (const name of msg.bundles ?? []) bundleSync(name);
+    // A package's name means all its parts (~config~1, ~config~2 …)
+    for (const name of msg.bundles ?? []) {
+      for (const part of index.bundles[name] ? [name] : Object.keys(index.bundles).filter((b) => b.startsWith(`${name}~`))) bundleSync(part);
+    }
     mountTree(FS, loaded);
     const t2 = performance.now();
     FS.mkdirTree('/work');

@@ -2,7 +2,7 @@
 // Builds the TeX Live tree for Peekbean's LaTeX viewer from the final TeX Live 2025 snapshot, which never changes:
 //
 //   texlive/bundles/<package>.gz      the run files of one TeX Live package, concatenated and gzipped; packages over
-//                                     24 MiB compressed are split into <package>~1.gz, <package>~2.gz …
+//                                     2 MiB are split into <package>~1.gz, <package>~2.gz …
 //   texlive/index.json                every file: its bundle and byte range in the unpacked bundle
 //   texlive/licenses.json             each package's license as TeX Live's catalogue records it
 //
@@ -24,6 +24,11 @@ const SNAPSHOT = 'https://ftp.tu-chemnitz.de/pub/tug/historic/systems/texlive/20
 const LEFT_OUT = new Set(['collection-binextra', 'collection-context', 'collection-texworks']);
 /** Cloudflare Pages serves files up to 25 MiB */
 const MAX_BUNDLE = 24 * 1024 * 1024;
+/**
+ * Unpacked size of one bundle. A bundle is fetched whole when TeX reads one of its files, so large packages come in
+ * parts: a document that uses six fonts of cm-super would otherwise load all of its 60 MB.
+ */
+const MAX_PART = 2 * 1024 * 1024;
 
 const root = path.join(import.meta.dirname, '..');
 const out = path.join(root, 'texlive');
@@ -110,11 +115,11 @@ const licenses = previous ? JSON.parse(readFileSync(path.join(out, 'licenses.jso
 const tree = path.join(cache, 'tree');
 
 function writeBundle(name, files) {
-  // files: [relative path, Buffer]; split when the compressed bundle would be too large
+  // files: [relative path, Buffer]; split into parts of MAX_PART, and further when one would still be too large
   const parts = [];
   let current = [], size = 0;
   for (const f of files) {
-    if (current.length && size + f[1].length > MAX_BUNDLE * 2.5) { parts.push(current); current = []; size = 0; }
+    if (current.length && size + f[1].length > MAX_PART) { parts.push(current); current = []; size = 0; }
     current.push(f);
     size += f[1].length;
   }
