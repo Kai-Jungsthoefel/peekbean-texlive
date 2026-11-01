@@ -2,7 +2,8 @@
 // Builds the TeX Live tree for Peekbean's LaTeX viewer from the final TeX Live 2025 snapshot, which never changes:
 //
 //   texlive/bundles/<package>.gz      the run files of one TeX Live package, concatenated and gzipped; packages over
-//                                     2 MiB are split into <package>~1.gz, <package>~2.gz …
+//                                     2 MiB are split into <package>@1.gz, <package>@2.gz … (not ~1: Windows
+//                                     reads such names as the short names of other files)
 //   texlive/index.json                every file: its bundle and byte range in the unpacked bundle
 //   texlive/licenses.json             each package's license as TeX Live's catalogue records it
 //
@@ -137,7 +138,7 @@ function writeBundle(name, files) {
   };
   for (const part of parts) written.push(...pack(part));
   written.forEach((w, i) => {
-    const bundle = written.length === 1 ? name : `${name}~${i + 1}`;
+    const bundle = written.length === 1 ? name : `${name}@${i + 1}`;
     if (w.gz.length > 25 * 1024 * 1024) throw new Error(`${bundle}: a single file is larger than 25 MiB compressed`);
     writeFileSync(path.join(out, 'bundles', `${bundle}.gz`), w.gz);
     bundles[bundle] = { size: w.raw, gz: w.gz.length, files: w.entries.length };
@@ -172,7 +173,7 @@ for (const name of configOnly ? [] : packages) {
 const read = (rel) => {
   const hit = index[rel];
   if (!hit) return null;
-  const dir = path.join(tree, hit[0].split('~')[0]);
+  const dir = path.join(tree, hit[0].split('@')[0]);
   const file = [path.join(dir, rel), path.join(dir, 'texmf-dist', rel)].find((f) => existsSync(f));
   return file ? readFileSync(file) : null;
 };

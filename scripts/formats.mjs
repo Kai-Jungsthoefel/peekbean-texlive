@@ -60,7 +60,7 @@ for (const block of tlpdb.split('\n\n')) {
 }
 add('hyph-utf8');
 const index = JSON.parse(readFileSync(path.join(out, 'index.json'), 'utf8'));
-const bundles = Object.keys(index.bundles).filter((b) => forFormats.has(b.split('~')[0]) || b === '~config');
+const bundles = Object.keys(index.bundles).filter((b) => forFormats.has(b.split('@')[0]));
 
 // ---------- Formats ----------
 
